@@ -88,15 +88,58 @@ The percentage difference is reported as a **model-adjusted association**, not a
 
 The nonlinear model also reports validation performance by city, including sample size, median actual and predicted asking price per m², median absolute percentage error, and median prediction bias. This helps reveal geographic variation that can be hidden by a single nationwide score.
 
-## 13. Monetary units
+## 13. Tehran neighborhood deep dive
+
+The Tehran extension groups the same core analytical sample by `neighborhood_slug`. For each neighborhood it reports listing count, median asking price, median asking price per m², interquartile range, median building size, rooms, construction year, amenity shares, and median approximate latitude/longitude.
+
+Neighborhood rankings require at least **250 listings**. A second threshold of 100 listings is used for the spatial visualization. These explicit thresholds reduce the risk that a very small neighborhood sample is presented as a stable market benchmark.
+
+The ranking also reports a **sample-size-stabilized neighborhood price benchmark**. The observed neighborhood median is combined on the log-price scale with the Tehran-wide median, using a credibility weight:
+
+```text
+weight = neighborhood listings / (neighborhood listings + 200)
+```
+
+The stabilized statistic therefore approaches the observed neighborhood median for large samples and is pulled toward the Tehran-wide median for smaller samples. This is a transparent ranking stabilization, not a Bayesian posterior estimate and not a transaction appraisal.
+
+## 14. Approximate neighborhood map
+
+The Tehran map uses the median latitude and longitude of listings in each eligible neighborhood. The dataset's geographic fields are approximate and may include a privacy radius, so the visualization represents **relative neighborhood location patterns** only.
+
+The project does not interpret these points as exact property coordinates, parcel boundaries, or official neighborhood polygons. Obvious geographic outliers are filtered with broad Iran bounds and robust within-city coordinate quantiles before plotting.
+
+## 15. Major-city monthly trends
+
+The five largest cities by listing count are selected dynamically from the current core sample. Monthly summaries require at least **150 listings per city-month** before a month is included in the trend comparison.
+
+Two time-series concepts are retained:
+
+1. **Raw monthly median asking-price index** — the monthly median price per m², rebased to 100.
+2. **Composition-adjusted asking-price index** — a residualized measure designed to reduce the effect of changes in the types of properties listed each month.
+
+Where the selected cities share a common eligible month, that earliest common month is used as the comparison base (=100). If no common month exists, city-specific first eligible months are used.
+
+## 16. Composition-adjusted price index
+
+Within each major city, a regularized Ridge model predicts log asking price per m² using observable property mix but **does not include listing month**. Controls include neighborhood, detailed property category/type, advertiser type, log building size, rooms, construction year, floor structure, elevator, parking, storage, renovation status, and balcony.
+
+For computational stability, up to 80,000 city observations are sampled deterministically for fitting, while the fitted model generates expected values for the full city sample. The monthly median residual is then converted to an index:
+
+```text
+adjusted index_t = exp(median residual_t - median residual_base) × 100
+```
+
+This is a hedonic-style **descriptive composition adjustment**. It is not a repeat-sales index, does not use verified transactions, and cannot control for unobserved quality or changes in platform coverage. In-sample fit statistics are reported as diagnostics only and are not presented as out-of-time predictive validation.
+
+## 17. Monetary units
 
 The official dataset documentation identifies `price_value` as the property price field but does not clearly document its currency denomination. The project therefore labels monetary values as **source units** unless independently validated.
 
-## 14. Time coverage
+## 18. Time coverage
 
 The project reports minimum and maximum dates actually observed in the downloaded analytical sample instead of hard-coding a period from potentially stale documentation.
 
-## 15. Limitations
+## 19. Limitations
 
 Key limitations include:
 
@@ -105,12 +148,13 @@ Key limitations include:
 - duplicate, stale, or strategically priced advertisements may exist;
 - feature missingness is not random;
 - city and neighborhood representation can be uneven;
-- approximate geographic fields are not exact addresses;
+- approximate geographic fields are not exact addresses or official boundaries;
 - architectural style and interior design quality are not directly observed;
 - correlations and model-adjusted associations do not establish causation;
+- the composition-adjusted time index does not remove unobserved quality change;
 - future market regimes may differ from the historical sample.
 
-## 16. Reproducibility
+## 20. Reproducibility
 
 The workflow is fully code-based:
 
@@ -119,5 +163,6 @@ The workflow is fully code-based:
 3. `src/market_analysis.py` creates nationwide descriptive outputs.
 4. `src/advanced_model.py` fits the interpretable temporal hedonic Ridge model.
 5. `src/predictive_model.py` fits the nonlinear benchmark, compares models, produces city diagnostics and predictive importance, and refreshes the executive summary and portfolio notebook.
+6. `src/city_deep_dive.py` produces Tehran neighborhood tables and maps, major-city monthly summaries, the composition-adjusted price index, a deep-dive report, and a second portfolio notebook.
 
 The raw and large processed datasets are excluded from Git. GitHub Actions rebuilds the analysis from the official source and commits only compact validated portfolio outputs.

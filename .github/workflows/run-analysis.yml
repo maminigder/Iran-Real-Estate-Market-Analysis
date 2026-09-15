@@ -45,6 +45,9 @@ jobs:
       - name: Run nonlinear predictive benchmark
         run: python src/predictive_model.py
 
+      - name: Build Tehran and major-cities deep dive
+        run: python src/city_deep_dive.py
+
       - name: Commit validated generated outputs
         run: |
           git config user.name "github-actions[bot]"
@@ -53,6 +56,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No output changes to commit."
           else
-            git commit -m "Generate advanced nationwide real-estate analysis outputs"
+            git commit -m "Generate advanced nationwide and city deep-dive outputs"
             git push
           fi
