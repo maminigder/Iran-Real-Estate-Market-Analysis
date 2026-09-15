@@ -1,0 +1,38 @@
+{
+  "model_name": "target_encoded_hist_gradient_boosting",
+  "target": "log_asking_price_per_sqm",
+  "temporal_holdout_start": "2024-10-01",
+  "training_rows_available": 318152,
+  "training_rows_used": 220000,
+  "validation_rows_available": 198795,
+  "validation_rows_used": 80000,
+  "baseline": {
+    "r2_log_ppsqm": 0.1930975105677657,
+    "mae_log_ppsqm": 0.7180644691852239,
+    "rmse_log_ppsqm": 1.5347448505529018,
+    "median_absolute_percentage_error": 0.2843292556680347,
+    "share_predictions_within_20_percent": 0.3855,
+    "share_predictions_within_30_percent": 0.5182375
+  },
+  "ridge_reference": {
+    "r2_log_ppsqm": 0.2813752494245504,
+    "mae_log_ppsqm": 0.7467951862291969,
+    "rmse_log_ppsqm": 1.4483607352613344,
+    "median_absolute_percentage_error": 0.37976403082051635,
+    "share_predictions_within_20_percent": 0.2511625,
+    "share_predictions_within_30_percent": 0.38965
+  },
+  "model": {
+    "r2_log_ppsqm": 0.3341722112239185,
+    "mae_log_ppsqm": 0.6562010239901469,
+    "rmse_log_ppsqm": 1.3941407308143996,
+    "median_absolute_percentage_error": 0.3123644030326198,
+    "share_predictions_within_20_percent": 0.3228125,
+    "share_predictions_within_30_percent": 0.4812125
+  },
+  "core_sample_price_tail_cutoffs": {
+    "lower_ppsqm_cutoff": 14.892249353233826,
+    "upper_ppsqm_cutoff": 380000000.0
+  },
+  "interpretation_note": "Predictive model for later listing prices, not verified transaction values. Feature importance and adjusted amenity outputs are non-causal."
+}

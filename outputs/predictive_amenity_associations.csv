@@ -1,0 +1,8 @@
+amenity,known_observations,raw_median_ppsqm_association_pct,nonlinear_model_adjusted_association_pct,interpretation
+has_elevator,299847,41.36546184738956,23.23403178471153,Conditional model association; not a causal price premium.
+has_parking,415940,48.773245819659316,14.874665975532842,Conditional model association; not a causal price premium.
+has_balcony,308615,36.5,1.4167302028805118,Conditional model association; not a causal price premium.
+is_rebuilt,308464,24.35973793924957,0.7238418932554724,Conditional model association; not a causal price premium.
+has_warehouse,415940,35.13513513513513,0.40959385020573613,Conditional model association; not a causal price premium.
+has_heating_system,0,,0.0,Conditional model association; not a causal price premium.
+has_cooling_system,0,,0.0,Conditional model association; not a causal price premium.
