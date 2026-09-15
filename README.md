@@ -3,7 +3,7 @@
 ![Code quality](https://github.com/maminigder/Iran-Real-Estate-Market-Analysis/actions/workflows/code-quality.yml/badge.svg)
 ![Build analysis outputs](https://github.com/maminigder/Iran-Real-Estate-Market-Analysis/actions/workflows/run-analysis.yml/badge.svg)
 
-A nationwide, reproducible data-analysis project examining residential property listings across Iran, with a focus on **asking-price patterns, regional differences, property characteristics, and observable indicators of housing modernization**.
+A nationwide, reproducible data-analysis project examining residential property listings across Iran, with a focus on **asking-price patterns, regional differences, property characteristics, modernization-related indicators, and out-of-time predictive modeling**.
 
 **Author:** Mohammad Amin Igder  
 **Coverage in the current analytical sample:** 420 Iranian cities  
@@ -11,14 +11,15 @@ A nationwide, reproducible data-analysis project examining residential property 
 
 ## Why this project
 
-This project connects real-estate domain knowledge with Python-based market analysis. It is designed as a professional portfolio project for work in real estate, business analysis, market research, commercial strategy, and data-informed decision making.
+This project connects real-estate domain knowledge with Python-based market analysis and machine learning. It is designed as a professional portfolio project for work in real estate, business analysis, market research, commercial strategy, and data-informed decision making.
 
 The analysis addresses questions such as:
 
 - How do residential asking prices and price per square metre differ across Iranian cities?
 - Which cities dominate listing activity in the nationwide sample?
 - How are property characteristics and amenities associated with asking prices?
-- How do construction period, elevators, parking, storage, and renovation status relate to market value?
+- How much predictive information remains after controlling for location, size, age, rooms, property category, and amenities?
+- Can a nonlinear model generalize to later listings better than a simple location benchmark?
 - What can be learned from listing data without confusing advertised prices with completed transaction prices?
 
 ## Data source
@@ -31,7 +32,7 @@ The raw dataset is **not redistributed in this repository**. The reproducible do
 
 > **Important:** prices are treated as advertised/listing values, not verified final transaction prices. The official documentation does not clearly specify the monetary denomination of `price_value`, so this project labels monetary values as **source units** unless independently verified.
 
-## First validated nationwide run
+## Validated nationwide sample
 
 The automated pipeline successfully processed the official source data and produced the following analytical sample:
 
@@ -48,8 +49,6 @@ The automated pipeline successfully processed the official source data and produ
 
 ### Largest city samples
 
-The five largest city samples in the core dataset are:
-
 | City | Listings | Median asking price / m² |
 | --- | ---: | ---: |
 | Tehran | 91,836 | 83.33M |
@@ -64,9 +63,46 @@ These are **descriptive listing-market statistics**, not transaction-price indic
 
 ![Median asking price per sqm by city](outputs/median_price_per_sqm_by_city.png)
 
+## Advanced modeling: interpretation + prediction
+
+A single model is not used for every purpose. The project deliberately separates **interpretability** from **predictive performance**:
+
+1. **Regularized hedonic Ridge model** — an interpretable multivariable model for controlled associations.
+2. **Target-encoded gradient-boosting model** — a nonlinear benchmark that captures interactions and complex relationships.
+3. **Location median baseline** — a deliberately simple benchmark based on city-neighborhood medians.
+
+All three are evaluated on the **same out-of-time holdout: October 2024 through March 2025**. The validation observations are not used to fit either advanced model.
+
+### Out-of-time model comparison
+
+| Model | R² on log price/m² | Log RMSE | Median absolute % error | Predictions within 20% |
+| --- | ---: | ---: | ---: | ---: |
+| Location median baseline | 0.193 | 1.535 | **28.4%** | **38.6%** |
+| Hedonic Ridge | 0.281 | 1.448 | 38.0% | 25.1% |
+| Nonlinear gradient boosting | **0.334** | **1.394** | 31.2% | 32.3% |
+
+The nonlinear model explains substantially more out-of-time variation and has the lowest log-scale RMSE. The simple location baseline, however, retains a lower median percentage error. This trade-off is reported explicitly rather than selecting a metric after seeing the results.
+
+![Model comparison](outputs/model_comparison.png)
+
+### What drives predictive performance?
+
+Permutation analysis on the temporal holdout indicates that the model relies most heavily on:
+
+- city-neighborhood location;
+- building size;
+- detailed property category;
+- elevator availability;
+- spatial longitude / latitude and city information;
+- room count, construction year, and parking availability.
+
+![Predictive feature importance](outputs/predictive_feature_importance.png)
+
+The project also produces city-level validation diagnostics so nationwide performance cannot hide markets where predictions are systematically weaker or biased.
+
 ## Amenities and modernization-related indicators
 
-The nationwide descriptive sample shows clear associations between several amenities and median asking price per m²:
+Raw nationwide comparisons show substantial differences in median asking price per m² between properties with and without several amenities:
 
 | Feature | Without feature | With feature |
 | --- | ---: | ---: |
@@ -75,7 +111,9 @@ The nationwide descriptive sample shows clear associations between several ameni
 | Storage / warehouse | 24.67M | 33.33M |
 | Rebuilt / renovated status | 28.75M | 35.75M |
 
-These comparisons **do not establish causation**. Properties with these features may also differ systematically by city, neighborhood, age, size, or quality. A later multivariable model can estimate adjusted associations.
+After a nonlinear model controls for the included location and property variables, the estimated associations become smaller: elevator availability is associated with approximately **+23.2%** and parking with approximately **+14.9%** in predicted asking price per m² on the counterfactual validation sample. These are **conditional model associations, not causal price premiums**.
+
+![Adjusted amenity associations](outputs/predictive_amenity_associations.png)
 
 ![Price per sqm by construction period](outputs/price_per_sqm_by_construction_period.png)
 
@@ -86,6 +124,15 @@ The Divar dataset does **not** directly label properties as having a "modern" or
 Instead, construction year and available amenities are treated as **observable modernization-related indicators**. Conclusions are framed as statistical associations in listing data rather than proof that an architectural style causes a particular price premium.
 
 Full methodology: [`docs/methodology.md`](docs/methodology.md)
+
+## Portfolio artifacts
+
+- [`outputs/EXECUTIVE_SUMMARY.md`](outputs/EXECUTIVE_SUMMARY.md) — business-facing interpretation of the advanced analysis.
+- [`outputs/MODEL_CARD.md`](outputs/MODEL_CARD.md) — hedonic Ridge model documentation.
+- [`outputs/PREDICTIVE_MODEL_CARD.md`](outputs/PREDICTIVE_MODEL_CARD.md) — nonlinear predictive model documentation.
+- [`notebooks/01_advanced_market_analysis.ipynb`](notebooks/01_advanced_market_analysis.ipynb) — portfolio walkthrough with model comparison and visuals.
+- [`outputs/predictive_city_validation.csv`](outputs/predictive_city_validation.csv) — city-level out-of-time diagnostic table.
+- [`outputs/model_comparison.csv`](outputs/model_comparison.csv) — machine-readable benchmark comparison.
 
 ## Data-quality note
 
@@ -102,22 +149,28 @@ Iran-Real-Estate-Market-Analysis/
 │   └── methodology.md
 ├── data/
 │   └── README.md
+├── notebooks/
+│   └── 01_advanced_market_analysis.ipynb
 ├── src/
 │   ├── download_data.py
 │   ├── prepare_sales_data.py
-│   └── market_analysis.py
+│   ├── market_analysis.py
+│   ├── advanced_model.py
+│   └── predictive_model.py
 ├── outputs/
+│   ├── EXECUTIVE_SUMMARY.md
+│   ├── MODEL_CARD.md
+│   ├── PREDICTIVE_MODEL_CARD.md
 │   ├── market_summary.json
-│   ├── city_summary.csv
-│   ├── amenity_summary.csv
-│   ├── construction_year_summary.csv
-│   └── charts...
+│   ├── model_comparison.csv
+│   ├── predictive_city_validation.csv
+│   └── charts and supporting tables...
 └── .github/workflows/
     ├── code-quality.yml
     └── run-analysis.yml
 ```
 
-## Reproduce the analysis locally
+## Reproduce the full analysis locally
 
 ```bash
 python -m venv .venv
@@ -125,9 +178,11 @@ pip install -r requirements.txt
 python src/download_data.py
 python src/prepare_sales_data.py
 python src/market_analysis.py
+python src/advanced_model.py
+python src/predictive_model.py
 ```
 
-The large raw and processed data files are intentionally excluded from Git. Generated validated summary outputs and charts are produced automatically by GitHub Actions.
+The large raw and processed data files are intentionally excluded from Git. GitHub Actions rebuilds the project from the official source and commits compact validated outputs automatically.
 
 ## Reproducibility and data ethics
 
@@ -138,6 +193,8 @@ The large raw and processed data files are intentionally excluded from Git. Gene
 - Asking prices are never presented as completed-sale transaction prices.
 - Geographic fields are treated as approximate rather than exact addresses.
 - Amenity-price relationships are described as associations, not causal effects.
+- Predictive validation is temporal rather than a convenient random split.
+- A simple location benchmark is retained so model complexity must justify itself empirically.
 
 ## License and attribution
 
@@ -145,12 +202,13 @@ The Divar source dataset is published under the **Open Database License (ODbL)**
 
 ## Next analytical extensions
 
-- Add a multivariable model controlling for city, size, rooms, construction year, and amenities.
-- Compare Tehran and other large markets at neighborhood level where sample coverage permits.
-- Build time-based city trends only after checking monthly sample stability.
-- Add an executive-summary notebook for portfolio presentation.
-- Develop a careful connection between modernization indicators and the broader real-estate research question.
+- Deep-dive into Tehran and other large markets at neighborhood level where coverage permits.
+- Test monthly stability before building city-level time indices.
+- Add duplicate-listing sensitivity checks and robustness analysis.
+- Explore spatial and city-group validation to test generalization beyond familiar neighborhoods.
+- Validate the source monetary denomination before presenting converted currency values.
+- Investigate quantile models to distinguish median-market prediction from upper/lower market segments.
 
 ---
 
-*This is an analytical portfolio project and should not be interpreted as investment, valuation, or legal advice.*
+*This is an analytical portfolio project and should not be interpreted as investment, valuation, legal, or certified appraisal advice.*
