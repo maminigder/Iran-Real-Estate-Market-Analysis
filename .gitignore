@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Raw and processed data
+# Keep documentation files, ignore generated datasets.
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Generated analysis outputs
+outputs/*.csv
+outputs/*.json
+outputs/*.png
+outputs/*.pdf
+!outputs/README.md
+
+# Local logs / temp files
+*.log
+*.tmp
+.cache/
