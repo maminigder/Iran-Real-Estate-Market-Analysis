@@ -1,0 +1,20 @@
+{
+  "lower_ppsqm_cutoff": 14.892249353233826,
+  "upper_ppsqm_cutoff": 380000000.0,
+  "core_rows": 516947,
+  "strict_duplicate_like_candidate_rows": 2091,
+  "strict_duplicate_like_extra_rows": 1093,
+  "strict_duplicate_like_extra_share_pct": 0.21143366728117197,
+  "strict_duplicate_like_clusters": 998,
+  "cross_month_repeat_like_clusters": 12182,
+  "cross_month_repeat_like_rows": 41181,
+  "cross_month_repeat_like_row_share_pct": 7.966193826446425,
+  "eligible_tehran_rows": 85408,
+  "eligible_tehran_neighborhoods": 215,
+  "spatial_group_folds": 3,
+  "affordable_upper_stabilized_ppsqm": 71480212.23010473,
+  "mid_market_upper_stabilized_ppsqm": 98089398.65712751,
+  "bootstrap_replications_per_neighborhood": 300,
+  "minimum_neighborhood_sample_for_uncertainty_and_tiers": 250,
+  "interpretation_note": "Duplicate detection is fingerprint-based and probabilistic; confidence intervals quantify sampling uncertainty in observed listings; spatial holdout tests unseen-neighborhood generalization; market tiers are relative analytical segments rather than certified valuation classes."
+}
