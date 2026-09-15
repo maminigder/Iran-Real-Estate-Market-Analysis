@@ -1,0 +1,36 @@
+{
+  "model_name": "regularized_hedonic_ridge",
+  "target": "log_asking_price_per_sqm",
+  "ridge_alpha": 5.0,
+  "temporal_holdout_start": "2024-10-01",
+  "training_period_start": "2021-02-01",
+  "training_period_end": "2024-09-01",
+  "validation_period_start": "2024-10-01",
+  "validation_period_end": "2025-03-01",
+  "training_rows_available": 318152,
+  "training_rows_used": 220000,
+  "validation_rows_available": 198795,
+  "validation_rows_used": 80000,
+  "baseline_r2_log_ppsqm": 0.1930975105677657,
+  "baseline": {
+    "r2_log_ppsqm": 0.1930975105677657,
+    "mae_log_ppsqm": 0.7180644691852239,
+    "rmse_log_ppsqm": 1.5347448505529018,
+    "median_absolute_percentage_error": 0.2843292556680347,
+    "share_predictions_within_20_percent": 0.3855,
+    "share_predictions_within_30_percent": 0.5182375
+  },
+  "model": {
+    "r2_log_ppsqm": 0.2813752494245504,
+    "mae_log_ppsqm": 0.7467951862291969,
+    "rmse_log_ppsqm": 1.4483607352613344,
+    "median_absolute_percentage_error": 0.37976403082051635,
+    "share_predictions_within_20_percent": 0.2511625,
+    "share_predictions_within_30_percent": 0.38965
+  },
+  "core_sample_price_tail_cutoffs": {
+    "lower_ppsqm_cutoff": 14.892249353233826,
+    "upper_ppsqm_cutoff": 380000000.0
+  },
+  "interpretation_note": "Model outputs are conditional associations and out-of-time predictions of listing prices. They are not causal effects or verified transaction-price estimates."
+}
