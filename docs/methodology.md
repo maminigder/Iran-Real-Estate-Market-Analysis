@@ -15,7 +15,7 @@ The analytical sample is restricted to records where:
 - `building_size > 0`
 - a city identifier is available
 
-The preparation pipeline also creates transparent plausibility flags for building size and construction year. Observations are preserved in the processed file; the main analysis uses only rows marked `analysis_ready`.
+The preparation pipeline creates transparent plausibility flags for building size and construction year. Observations are preserved in the processed file; the main analysis uses only rows marked `analysis_ready`.
 
 ## 3. Price per square metre
 
@@ -25,117 +25,99 @@ For records with a positive asking price and positive building size:
 asking price per m² = price_value / building_size
 ```
 
-Because real-estate prices are strongly right-skewed, city comparisons emphasize the **median** rather than the arithmetic mean.
-
-For the nationwide analytical sample, the lowest 0.5% and highest 0.5% of asking-price-per-m² observations are excluded from the core comparison sample. This reduces the influence of obvious recording errors and extreme listings without modifying the stored processed dataset.
+Because real-estate prices are strongly right-skewed, city comparisons emphasize the **median** rather than the arithmetic mean. For the nationwide analytical sample, the lowest 0.5% and highest 0.5% of asking-price-per-m² observations are excluded from the core comparison sample. The original processed observations remain unchanged.
 
 ## 4. City comparisons
 
-City rankings apply a minimum sample threshold. The default threshold in the code is 100 usable listings per city. This prevents tiny samples from appearing as precise market rankings.
-
-Both listing count and median asking price per m² are reported because market coverage differs significantly across cities.
+City rankings apply a minimum sample threshold of 100 usable listings by default. Both listing count and median asking price per m² are reported because market coverage differs substantially across cities.
 
 ## 5. Modernization indicators
 
-The source data does not contain a validated architectural-style label such as "modern" or "traditional." Therefore, the project does **not** infer architectural style directly.
+The source data does not contain a validated architectural-style label such as "modern" or "traditional." The project therefore does **not** infer architectural style directly.
 
-Instead, the analysis uses observable variables that can reasonably be described as modernization-related indicators, including:
-
-- construction year
-- elevator availability
-- parking availability
-- storage/warehouse availability
-- renovation status
-- balcony availability
-- heating and cooling systems, where coverage is sufficient
-
-These variables are interpreted as associations with asking price, not as proof that a particular architectural style causes a price premium.
+Observable modernization-related indicators include construction year, elevator, parking, storage/warehouse, renovation status, balcony, and heating/cooling systems where sufficient information is present. They are interpreted as associations with asking price rather than proof of architectural causation.
 
 ## 6. Construction year
 
-Construction years are stored in Persian/Jalali format in the source data. Persian and Arabic numerals are normalized to Western digits while preserving the Jalali year itself. The project avoids unnecessary calendar conversion when the analysis only requires relative age groups.
+Construction years are stored in Persian/Jalali format. Persian and Arabic numerals are normalized to Western digits while preserving the Jalali year. Descriptive groups are up to 1379, 1380–1389, 1390–1399, and 1400+.
 
-The descriptive grouping is:
+## 7. Interpretable hedonic model
 
-- up to 1379
-- 1380–1389
-- 1390–1399
-- 1400 and newer
+The first advanced layer is a **regularized Ridge hedonic regression** with natural log asking price per m² as the target. Controls include log building size, rooms, construction year, floor structure, listing-month trend, city-neighborhood location, property type/category, advertiser type, and available amenities.
 
-## 7. Advanced hedonic model
+Continuous features are median-imputed and standardized. Categorical features are one-hot encoded with rare categories grouped. Amenity missingness is retained as an explicit unknown category. Ridge regularization (`alpha = 5.0`) stabilizes estimates in the presence of many correlated characteristics and location indicators.
 
-The advanced stage uses a **regularized hedonic Ridge regression**. The target is the natural logarithm of asking price per square metre. A log target reduces the influence of extreme values and allows percentage-style interpretation of modeled differences.
+This model is retained primarily as the more interpretable controlled-association layer.
 
-The model includes the following feature groups:
+## 8. Nonlinear predictive benchmark
 
-- log building size
-- room count
-- construction year
-- floor number
-- total floors
-- units per floor
-- listing month trend
-- a city + neighborhood composite location control
-- property type
-- detailed residential category
-- advertiser/user type
-- elevator, parking, storage, renovation, balcony, heating, and cooling indicators
+A second model is added to test whether nonlinear relationships and feature interactions improve prediction of later listings. It combines:
 
-Rare categorical levels are grouped by the encoder using a minimum training-frequency threshold. Continuous features are median-imputed and standardized. Amenity missingness is represented explicitly as an `unknown` category rather than silently treating missing values as absence.
+- cross-fitted `TargetEncoder` for high-cardinality categorical variables;
+- `HistGradientBoostingRegressor` for nonlinear prediction;
+- city and city-neighborhood location controls;
+- approximate latitude, longitude, and privacy radius as additional spatial signals;
+- the same property, time, advertiser, and amenity information used in the broader analytical pipeline.
 
-The model is regularized with Ridge regression (`alpha = 5.0`) so that highly correlated real-estate characteristics and large sets of location indicators do not produce unstable unregularized coefficients.
+Target encoding is cross-fitted during training to reduce target leakage. The nonlinear model is complementary to, rather than a replacement for, the Ridge model: the Ridge layer supports interpretation while gradient boosting provides a stronger predictive benchmark where the data supports it.
 
-## 8. Temporal validation
+## 9. Temporal validation and baseline
 
-The advanced model uses an **out-of-time holdout**, not a random train/test split. The latest six observed listing months are reserved for validation and are never used for fitting.
+Both advanced models use an **out-of-time holdout** rather than a random split. The latest six observed listing months are reserved for validation and are never used for fitting.
 
-This design is more demanding and more realistic for a market-analysis use case because the model must generalize to later listings rather than merely reconstruct randomly held-out records from the same time distribution.
+A naive benchmark predicts the median log asking price per m² for each training-sample city-neighborhood combination, with city and nationwide fallbacks for unseen locations. All models are compared on the same holdout using:
 
-A naive benchmark is also calculated using the median log asking price per m² for each training-sample city-neighborhood location, with city and nationwide fallbacks for previously unseen locations. The advanced model is compared against this location baseline using out-of-time R² and percentage-error diagnostics.
+- R² on log asking price per m²;
+- log-scale MAE and RMSE;
+- median absolute percentage error on the original price-per-m² scale;
+- share of predictions within 20% and 30% of the listed value.
 
-## 9. Feature importance
+This prevents a sophisticated model from appearing valuable merely because location alone is highly predictive.
 
-Feature-group importance is measured by **permutation on the temporal holdout**. One raw feature group is shuffled at a time while all other columns remain unchanged. The decrease in validation R² is recorded.
+## 10. Feature-group importance
 
-This answers a practical question: how much predictive information does the fitted model lose when a given feature group is disrupted? It should not be interpreted as a causal ranking.
+Feature importance is measured by permutation on the temporal holdout. One raw feature group is shuffled while all other fields remain unchanged, and the loss in validation R² is recorded. This quantifies predictive information, not causal importance.
 
-## 10. Adjusted amenity associations
+## 11. Adjusted amenity associations
 
-For each amenity, the fitted model is used to create two counterfactual prediction sets on the same validation properties: one with the amenity set to `false` and one set to `true`, while every other modeled characteristic remains fixed.
+For each amenity, the fitted models can generate paired counterfactual predictions for the same validation properties with the amenity set to `false` and `true`, while included controls remain fixed.
 
-The resulting percentage difference is reported as a **model-adjusted association**. This is intentionally not labeled a causal premium because unobserved building quality, micro-location, developer quality, interior condition, and seller strategy may remain confounded with the amenity.
+The percentage difference is reported as a **model-adjusted association**, not a causal premium. Unobserved building quality, exact micro-location, developer quality, interior condition, seller strategy, and selection effects can still confound the relationship.
 
-## 11. Monetary units
+## 12. City-level predictive diagnostics
 
-The official dataset documentation identifies `price_value` as the property price field but does not clearly document its currency denomination. Individual advertisements often contain Persian price text consistent with Iranian market conventions, but this project does not rely on text inference to declare a universal unit.
+The nonlinear model also reports validation performance by city, including sample size, median actual and predicted asking price per m², median absolute percentage error, and median prediction bias. This helps reveal geographic variation that can be hidden by a single nationwide score.
 
-Accordingly, code and charts refer to **source units** unless the denomination is independently validated.
+## 13. Monetary units
 
-## 12. Time coverage
+The official dataset documentation identifies `price_value` as the property price field but does not clearly document its currency denomination. The project therefore labels monetary values as **source units** unless independently validated.
 
-The project reports the observed minimum and maximum dates from the downloaded analytical sample rather than hard-coding a date period. This avoids relying on potentially stale documentation when the currently published source file contains a wider observed range.
+## 14. Time coverage
 
-## 13. Limitations
+The project reports minimum and maximum dates actually observed in the downloaded analytical sample instead of hard-coding a period from potentially stale documentation.
+
+## 15. Limitations
 
 Key limitations include:
 
 - asking prices may differ from final transaction prices;
-- Divar listings are not a complete census of all Iranian real-estate transactions;
+- Divar listings are not a complete census of Iranian real-estate transactions;
 - duplicate, stale, or strategically priced advertisements may exist;
 - feature missingness is not random;
 - city and neighborhood representation can be uneven;
-- approximate geographic fields should not be interpreted as exact addresses;
+- approximate geographic fields are not exact addresses;
 - architectural style and interior design quality are not directly observed;
 - correlations and model-adjusted associations do not establish causation;
 - future market regimes may differ from the historical sample.
 
-## 14. Reproducibility
+## 16. Reproducibility
 
-The full workflow is code-based:
+The workflow is fully code-based:
 
 1. `src/download_data.py` downloads the official source file.
-2. `src/prepare_sales_data.py` filters and standardizes the residential-sale sample.
-3. `src/market_analysis.py` creates nationwide descriptive summaries and visualizations.
-4. `src/advanced_model.py` fits the temporal hedonic model, evaluates it against a location baseline, measures feature-group importance, generates adjusted amenity associations, creates a model card and executive summary, and builds the portfolio notebook.
+2. `src/prepare_sales_data.py` filters and standardizes residential-sale listings.
+3. `src/market_analysis.py` creates nationwide descriptive outputs.
+4. `src/advanced_model.py` fits the interpretable temporal hedonic Ridge model.
+5. `src/predictive_model.py` fits the nonlinear benchmark, compares models, produces city diagnostics and predictive importance, and refreshes the executive summary and portfolio notebook.
 
-The raw dataset and generated local analytical files are excluded from Git. GitHub Actions rebuilds the analysis from the official source and commits only the compact validated outputs needed for the public portfolio.
+The raw and large processed datasets are excluded from Git. GitHub Actions rebuilds the analysis from the official source and commits only compact validated portfolio outputs.
