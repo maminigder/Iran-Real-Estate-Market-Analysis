@@ -1,0 +1,6 @@
+pandas>=2.2,<3.0
+numpy>=1.26,<3.0
+pyarrow>=17,<22
+matplotlib>=3.9,<4.0
+huggingface_hub>=0.25,<1.0
+jupyter>=1.1,<2.0
