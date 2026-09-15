@@ -36,17 +36,20 @@ jobs:
       - name: Prepare residential-sale dataset
         run: python src/prepare_sales_data.py
 
-      - name: Generate analysis outputs
+      - name: Generate descriptive analysis outputs
         run: python src/market_analysis.py
+
+      - name: Run advanced hedonic model
+        run: python src/advanced_model.py
 
       - name: Commit validated generated outputs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f outputs/*.csv outputs/*.json outputs/*.png
+          git add -f outputs/*.csv outputs/*.json outputs/*.png outputs/*.md notebooks/*.ipynb
           if git diff --cached --quiet; then
             echo "No output changes to commit."
           else
-            git commit -m "Generate nationwide real-estate analysis outputs"
+            git commit -m "Generate advanced nationwide real-estate analysis outputs"
             git push
           fi
