@@ -3,7 +3,7 @@
 ![Code quality](https://github.com/maminigder/Iran-Real-Estate-Market-Analysis/actions/workflows/code-quality.yml/badge.svg)
 ![Build analysis outputs](https://github.com/maminigder/Iran-Real-Estate-Market-Analysis/actions/workflows/run-analysis.yml/badge.svg)
 
-A nationwide, reproducible data-analysis project examining residential property listings across Iran, with a focus on **asking-price patterns, regional differences, property characteristics, modernization-related indicators, and out-of-time predictive modeling**.
+A nationwide, reproducible data-analysis project examining residential property listings across Iran, with **market segmentation, Tehran neighborhood analytics, approximate spatial mapping, time-series tracking, modernization-related indicators, and out-of-time predictive modeling**.
 
 **Author:** Mohammad Amin Igder  
 **Coverage in the current analytical sample:** 420 Iranian cities  
@@ -17,8 +17,10 @@ The analysis addresses questions such as:
 
 - How do residential asking prices and price per square metre differ across Iranian cities?
 - Which cities dominate listing activity in the nationwide sample?
+- Which Tehran neighborhoods form the highest-price market segments after minimum-sample controls?
+- How do approximate neighborhood locations and amenity profiles differ within Tehran?
+- How do asking-price trends change after controlling for shifts in the mix of listed properties?
 - How are property characteristics and amenities associated with asking prices?
-- How much predictive information remains after controlling for location, size, age, rooms, property category, and amenities?
 - Can a nonlinear model generalize to later listings better than a simple location benchmark?
 - What can be learned from listing data without confusing advertised prices with completed transaction prices?
 
@@ -62,6 +64,59 @@ These are **descriptive listing-market statistics**, not transaction-price indic
 ![Top cities by listing count](outputs/top_cities_by_listing_count.png)
 
 ![Median asking price per sqm by city](outputs/median_price_per_sqm_by_city.png)
+
+## Tehran & major-cities deep dive
+
+The project now includes a second analytical layer focused on **local market structure** rather than only national averages. Tehran contains **91,836** listings in the core sample, with **345 neighborhood identifiers** and **104 neighborhoods** meeting the stricter 250-listing ranking threshold.
+
+To avoid unstable small-sample rankings, neighborhood medians are combined with a transparent sample-size stabilization toward the Tehran-wide median. The map uses median approximate listing coordinates for each neighborhood; it does not imply exact addresses or official neighborhood boundaries.
+
+### Highest stabilized Tehran neighborhood benchmarks
+
+| Neighborhood | Listings | Stabilized asking price / m² | Raw median vs Tehran |
+| --- | ---: | ---: | ---: |
+| Zafaraniyeh | 795 | 190.39M | +181.2% |
+| Elahiyeh | 642 | 178.04M | +170.7% |
+| Velenjak | 531 | 175.91M | +179.7% |
+| Niavaran | 878 | 167.76M | +136.1% |
+| Farmaniyeh | 638 | 166.02M | +147.3% |
+| Darrous | 706 | 161.16M | +133.1% |
+| Saadat Abad | 1,590 | 155.82M | +102.3% |
+| Qeytariyeh | 950 | 149.71M | +103.2% |
+| Shahrak-e Gharb | 480 | 147.37M | +124.3% |
+| Pasdaran | 927 | 145.29M | +96.6% |
+
+![Tehran neighborhood asking-price map](outputs/tehran_neighborhood_price_map.png)
+
+![Tehran neighborhood price ranking](outputs/tehran_neighborhood_price_ranking.png)
+
+The project also compares the amenity profile of the largest Tehran neighborhood samples, including elevator, parking, storage, and rebuilt-status coverage.
+
+![Tehran neighborhood amenity profile](outputs/tehran_neighborhood_amenity_profile.png)
+
+### Major-city composition-adjusted time trends
+
+The five largest markets by listing count are selected dynamically: **Tehran, Mashhad, Karaj, Isfahan, and Shiraz**. City-months require at least **150 listings**, and the first month eligible across all five markets is **May 2024** for the common-base chart.
+
+Raw monthly medians can move simply because the composition of listed properties changes. A within-city regularized model therefore controls for neighborhood, property type/category, size, rooms, construction year, floor structure, advertiser type, and amenities. The monthly residual pattern is converted into a **composition-adjusted asking-price index**.
+
+| City | Eligible months | Latest median asking price / m² | Raw change from first eligible month | Composition-adjusted change |
+| --- | ---: | ---: | ---: | ---: |
+| Tehran | 10 | 97.37M | -4.3% | +21.4% |
+| Shiraz | 8 | 40.00M | +9.6% | +20.8% |
+| Isfahan | 9 | 35.61M | -5.7% | +36.6% |
+| Karaj | 9 | 33.97M | -2.9% | +6.0% |
+| Mashhad | 9 | 31.25M | -4.6% | +17.1% |
+
+The divergence between raw and adjusted series is itself useful: it shows why a simple monthly median can be misleading when the mix of neighborhoods, sizes, ages, and property types changes. The adjusted series is still a descriptive listing-market measure, **not an official house-price or repeat-sales index**.
+
+![Major cities composition-adjusted price index](outputs/major_cities_composition_adjusted_price_index.png)
+
+![Major cities monthly listing volume](outputs/major_cities_monthly_listing_volume.png)
+
+![Major cities market positioning](outputs/major_cities_market_positioning.png)
+
+Full city report: [`outputs/CITY_DEEP_DIVE.md`](outputs/CITY_DEEP_DIVE.md)
 
 ## Advanced modeling: interpretation + prediction
 
@@ -127,10 +182,14 @@ Full methodology: [`docs/methodology.md`](docs/methodology.md)
 
 ## Portfolio artifacts
 
-- [`outputs/EXECUTIVE_SUMMARY.md`](outputs/EXECUTIVE_SUMMARY.md) — business-facing interpretation of the advanced analysis.
+- [`outputs/CITY_DEEP_DIVE.md`](outputs/CITY_DEEP_DIVE.md) — Tehran neighborhood and major-city time-series report.
+- [`notebooks/02_city_deep_dive.ipynb`](notebooks/02_city_deep_dive.ipynb) — portfolio walkthrough for neighborhood and trend analysis.
+- [`outputs/tehran_neighborhood_summary.csv`](outputs/tehran_neighborhood_summary.csv) — detailed Tehran neighborhood metrics.
+- [`outputs/major_cities_monthly_trends.csv`](outputs/major_cities_monthly_trends.csv) — raw and composition-adjusted monthly series.
+- [`outputs/EXECUTIVE_SUMMARY.md`](outputs/EXECUTIVE_SUMMARY.md) — business-facing interpretation of the advanced nationwide analysis.
 - [`outputs/MODEL_CARD.md`](outputs/MODEL_CARD.md) — hedonic Ridge model documentation.
 - [`outputs/PREDICTIVE_MODEL_CARD.md`](outputs/PREDICTIVE_MODEL_CARD.md) — nonlinear predictive model documentation.
-- [`notebooks/01_advanced_market_analysis.ipynb`](notebooks/01_advanced_market_analysis.ipynb) — portfolio walkthrough with model comparison and visuals.
+- [`notebooks/01_advanced_market_analysis.ipynb`](notebooks/01_advanced_market_analysis.ipynb) — advanced-model walkthrough.
 - [`outputs/predictive_city_validation.csv`](outputs/predictive_city_validation.csv) — city-level out-of-time diagnostic table.
 - [`outputs/model_comparison.csv`](outputs/model_comparison.csv) — machine-readable benchmark comparison.
 
@@ -150,20 +209,23 @@ Iran-Real-Estate-Market-Analysis/
 ├── data/
 │   └── README.md
 ├── notebooks/
-│   └── 01_advanced_market_analysis.ipynb
+│   ├── 01_advanced_market_analysis.ipynb
+│   └── 02_city_deep_dive.ipynb
 ├── src/
 │   ├── download_data.py
 │   ├── prepare_sales_data.py
 │   ├── market_analysis.py
 │   ├── advanced_model.py
-│   └── predictive_model.py
+│   ├── predictive_model.py
+│   └── city_deep_dive.py
 ├── outputs/
+│   ├── CITY_DEEP_DIVE.md
 │   ├── EXECUTIVE_SUMMARY.md
 │   ├── MODEL_CARD.md
 │   ├── PREDICTIVE_MODEL_CARD.md
-│   ├── market_summary.json
+│   ├── tehran_neighborhood_summary.csv
+│   ├── major_cities_monthly_trends.csv
 │   ├── model_comparison.csv
-│   ├── predictive_city_validation.csv
 │   └── charts and supporting tables...
 └── .github/workflows/
     ├── code-quality.yml
@@ -180,6 +242,7 @@ python src/prepare_sales_data.py
 python src/market_analysis.py
 python src/advanced_model.py
 python src/predictive_model.py
+python src/city_deep_dive.py
 ```
 
 The large raw and processed data files are intentionally excluded from Git. GitHub Actions rebuilds the project from the official source and commits compact validated outputs automatically.
@@ -189,11 +252,12 @@ The large raw and processed data files are intentionally excluded from Git. GitH
 - Source data is anonymized by the publisher.
 - Raw data is not committed to this repository.
 - Cleaning rules are implemented in code rather than manually in a spreadsheet.
-- Price-per-m² outlier treatment and city sample thresholds are explicit and reproducible.
+- Price-per-m² outlier treatment, neighborhood thresholds, and monthly sample thresholds are explicit and reproducible.
 - Asking prices are never presented as completed-sale transaction prices.
-- Geographic fields are treated as approximate rather than exact addresses.
+- Geographic fields are treated as approximate rather than exact addresses or official polygons.
 - Amenity-price relationships are described as associations, not causal effects.
 - Predictive validation is temporal rather than a convenient random split.
+- The composition-adjusted time series is clearly separated from an official transaction-price index.
 - A simple location benchmark is retained so model complexity must justify itself empirically.
 
 ## License and attribution
@@ -202,12 +266,11 @@ The Divar source dataset is published under the **Open Database License (ODbL)**
 
 ## Next analytical extensions
 
-- Deep-dive into Tehran and other large markets at neighborhood level where coverage permits.
-- Test monthly stability before building city-level time indices.
 - Add duplicate-listing sensitivity checks and robustness analysis.
-- Explore spatial and city-group validation to test generalization beyond familiar neighborhoods.
+- Test spatial holdouts to measure generalization to unseen neighborhoods.
+- Investigate quantile models for lower, middle, and premium market segments.
+- Add uncertainty intervals around neighborhood and time-index estimates.
 - Validate the source monetary denomination before presenting converted currency values.
-- Investigate quantile models to distinguish median-market prediction from upper/lower market segments.
 
 ---
 
