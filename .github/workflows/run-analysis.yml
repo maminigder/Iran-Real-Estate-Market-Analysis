@@ -1,0 +1,52 @@
+name: Build analysis outputs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "requirements.txt"
+      - ".github/workflows/run-analysis.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download official Divar dataset
+        run: python src/download_data.py
+
+      - name: Prepare residential-sale dataset
+        run: python src/prepare_sales_data.py
+
+      - name: Generate analysis outputs
+        run: python src/market_analysis.py
+
+      - name: Commit validated generated outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f outputs/*.csv outputs/*.json outputs/*.png
+          if git diff --cached --quiet; then
+            echo "No output changes to commit."
+          else
+            git commit -m "Generate nationwide real-estate analysis outputs"
+            git push
+          fi
