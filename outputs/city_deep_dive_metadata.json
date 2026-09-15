@@ -1,0 +1,21 @@
+{
+  "target_city": "tehran",
+  "major_cities": [
+    "tehran",
+    "mashhad",
+    "karaj",
+    "isfahan",
+    "shiraz"
+  ],
+  "minimum_neighborhood_sample": 100,
+  "minimum_neighborhood_ranking_sample": 250,
+  "minimum_monthly_sample": 150,
+  "common_trend_base_month": "2024-05-01",
+  "core_rows": 516947,
+  "tehran_rows": 91836,
+  "tehran_neighborhoods_total": 345,
+  "tehran_neighborhoods_ranking_eligible": 104,
+  "lower_ppsqm_cutoff": 14.892249353233826,
+  "upper_ppsqm_cutoff": 380000000.0,
+  "interpretation_note": "Deep-dive metrics use asking prices from listings. The neighborhood map uses approximate coordinates, and the adjusted time series is a descriptive composition-adjusted listing index rather than an official transaction-price index."
+}
