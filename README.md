@@ -3,39 +3,70 @@
 ![Code quality](https://github.com/maminigder/Iran-Real-Estate-Market-Analysis/actions/workflows/code-quality.yml/badge.svg)
 ![Build analysis outputs](https://github.com/maminigder/Iran-Real-Estate-Market-Analysis/actions/workflows/run-analysis.yml/badge.svg)
 
-A nationwide, reproducible real-estate data project covering **market analysis, Tehran neighborhood intelligence, approximate spatial mapping, time-series tracking, machine-learning benchmarks, uncertainty analysis, duplicate-risk sensitivity, unseen-neighborhood validation, and market segmentation**.
+A nationwide, reproducible real-estate market intelligence project combining **market analysis, neighborhood analytics, spatial modeling, time-series adjustment, machine learning, uncertainty analysis, and robustness testing**.
 
 **Author:** Mohammad Amin Igder  
-**Current analytical coverage:** 420 Iranian cities  
-**Core sample:** 516,947 residential-sale listings
+**Focus:** Real Estate • Market Analysis • Business Analytics • Python • Machine Learning
 
-## Why this project
+> **Recruiter / hiring manager:** start with the [Executive Portfolio — 30-second project overview](EXECUTIVE_PORTFOLIO.md).
 
-This portfolio project combines real-estate domain knowledge with Python-based market analysis and machine learning. It is designed to demonstrate skills relevant to real estate, business analysis, market research, commercial strategy, and data-informed decision making.
+## Project at a glance
 
-It asks practical questions such as:
+| Key metric | Result |
+| --- | ---: |
+| **Residential-sale listings analyzed** | **516,947** |
+| **Iranian cities covered** | **420** |
+| **Tehran listings analyzed** | **91,836** |
+| **Best out-of-time nationwide model R²** | **0.334** |
+| **Median error on completely unseen Tehran neighborhoods** | **20.9%** |
+
+The project starts from **1,000,000 anonymized Divar real-estate advertisements** and turns them into a reproducible analytical workflow with data-quality controls, city and neighborhood benchmarks, predictive models, temporal validation, spatial holdouts, bootstrap uncertainty, duplicate-risk sensitivity, and market segmentation.
+
+### Three visuals that summarize the project
+
+**1. Tehran neighborhood market structure**
+
+![Tehran neighborhood asking-price map](outputs/tehran_neighborhood_price_map.png)
+
+**2. Nationwide out-of-time model comparison**
+
+![Model comparison](outputs/model_comparison.png)
+
+**3. Tehran Affordable / Mid-market / Premium segmentation**
+
+![Tehran market segments](outputs/tehran_market_segments.png)
+
+## What this project demonstrates
+
+- **Real-estate market intelligence:** nationwide city comparisons, Tehran neighborhood benchmarking, amenity profiles, and market segmentation.
+- **Applied machine learning:** interpretable hedonic Ridge regression plus nonlinear gradient boosting.
+- **Validation discipline:** later-period temporal holdout and grouped spatial holdout on neighborhoods never seen during training.
+- **Risk-aware analytics:** bootstrap confidence intervals, duplicate-like listing sensitivity, explicit sample thresholds, and benchmark comparisons.
+- **Reproducibility:** code-based data preparation, documented methodology, notebooks, and automated GitHub Actions workflows.
+
+## Business problem
+
+Residential real-estate markets are highly local. National averages can hide major differences between cities and neighborhoods, and raw monthly asking-price changes can be distorted when the mix of listed properties changes.
+
+This project asks practical questions:
 
 - How do residential asking prices and price per square metre differ across Iranian cities?
-- Which Tehran neighborhoods sit in higher- and lower-price market tiers?
-- How stable are neighborhood price estimates once sampling uncertainty is measured?
-- How sensitive are headline statistics to duplicate-like listings?
-- Can a model generalize to a Tehran neighborhood it has never seen during training?
-- How do raw city trends change after controlling for shifts in the mix of listed properties?
-- Which property characteristics and modernization-related amenities are associated with asking prices?
+- Which Tehran neighborhoods occupy higher- and lower-price market segments?
+- Which property and location characteristics carry the most predictive information?
+- Can a model generalize to later listings and to neighborhoods it has never seen before?
+- How robust are the conclusions to duplicate-like listings, sampling uncertainty, and changing property mix?
 
-## Data source
+## Data source and validated sample
 
 The project uses the **Divar Real Estate Ads Dataset**, published by Divar on Hugging Face. The source contains **1,000,000 anonymized real-estate advertisements** and 57 fields covering listing category, city, neighborhood, price, size, construction year, amenities, and approximate geographic information.
 
 Source: https://huggingface.co/datasets/divarofficial/real_estate_ads
 
-The raw dataset is **not redistributed in this repository**. The pipeline downloads it from the official source.
+The raw dataset is **not redistributed in this repository**. The reproducible pipeline downloads it from the official source.
 
-> **Important:** the analysis uses advertised/listing values, not verified final transaction prices. The official documentation does not clearly specify the monetary denomination of `price_value`, so monetary values are labelled **source units** unless independently verified.
+> **Important:** prices are advertised/listing values, not verified completed transaction prices. The source documentation does not clearly verify the monetary denomination of `price_value`, so monetary results are labelled **source units**.
 
-## Validated nationwide sample
-
-| Metric | Result |
+| Sample metric | Result |
 | --- | ---: |
 | Residential-sale rows with usable price and size | 533,242 |
 | Analysis-ready rows before tail filtering | 522,163 |
@@ -43,8 +74,7 @@ The raw dataset is **not redistributed in this repository**. The pipeline downlo
 | Cities represented | 420 |
 | Observed listing-month range | Feb 2021 – Mar 2025 |
 | Median building size | 110 m² |
-| Median asking price | 2.80B source units |
-| Median asking price per m² | 27.71M source units |
+| Median asking price / m² | 27.71M source units |
 
 ### Largest city samples
 
@@ -58,11 +88,9 @@ The raw dataset is **not redistributed in this repository**. The pipeline downlo
 
 ![Top cities by listing count](outputs/top_cities_by_listing_count.png)
 
-![Median asking price per sqm by city](outputs/median_price_per_sqm_by_city.png)
-
 ## Tehran & major-cities deep dive
 
-Tehran contains **91,836** listings in the core sample, with **345 neighborhood identifiers**. For price ranking, neighborhoods require at least **250 listings** and the ranking uses a sample-size-stabilized benchmark that shrinks smaller samples toward the Tehran-wide median.
+Tehran contains **91,836** listings and **345 neighborhood identifiers** in the core sample. Neighborhood price ranking requires at least **250 listings** and uses a sample-size-stabilized benchmark so smaller samples do not dominate the ranking through noise.
 
 ### Highest stabilized Tehran neighborhood benchmarks
 
@@ -79,17 +107,13 @@ Tehran contains **91,836** listings in the core sample, with **345 neighborhood 
 | Shahrak-e Gharb | 480 | 147.37M | +124.3% |
 | Pasdaran | 927 | 145.29M | +96.6% |
 
-![Tehran neighborhood asking-price map](outputs/tehran_neighborhood_price_map.png)
-
 ![Tehran neighborhood price ranking](outputs/tehran_neighborhood_price_ranking.png)
 
-![Tehran neighborhood amenity profile](outputs/tehran_neighborhood_amenity_profile.png)
+Full city analysis: [`outputs/CITY_DEEP_DIVE.md`](outputs/CITY_DEEP_DIVE.md)
 
-### Major-city composition-adjusted time trends
+## Major-city time trends
 
-The five largest markets by listing count are selected dynamically: **Tehran, Mashhad, Karaj, Isfahan, and Shiraz**. City-months require at least 150 listings.
-
-A regularized within-city model controls for observable changes in neighborhood, property type/category, size, rooms, construction year, floor structure, advertiser type, and amenities. The monthly residual pattern is then converted into a **composition-adjusted asking-price index**.
+The five largest markets by listing count are **Tehran, Mashhad, Karaj, Isfahan, and Shiraz**. A regularized within-city model controls for observed changes in neighborhood, property type/category, size, rooms, construction year, floor structure, advertiser type, and amenities. The monthly residual pattern is then converted into a **composition-adjusted asking-price index**.
 
 | City | Eligible months | Latest median asking price / m² | Raw change | Composition-adjusted change |
 | --- | ---: | ---: | ---: | ---: |
@@ -103,36 +127,47 @@ The adjusted series is a descriptive listing-market measure, **not an official h
 
 ![Major cities composition-adjusted price index](outputs/major_cities_composition_adjusted_price_index.png)
 
-![Major cities market positioning](outputs/major_cities_market_positioning.png)
+## Advanced modeling: interpretation + prediction
 
-Full city report: [`outputs/CITY_DEEP_DIVE.md`](outputs/CITY_DEEP_DIVE.md)
+The project deliberately separates **interpretability** from **predictive performance**:
+
+1. **Regularized hedonic Ridge model** — controlled, interpretable multivariable associations.
+2. **Target-encoded gradient boosting** — nonlinear predictive benchmark.
+3. **Location median baseline** — simple benchmark used to test whether complexity adds value.
+
+All three are evaluated on the same **out-of-time holdout: October 2024 through March 2025**.
+
+| Model | R² on log price/m² | Log RMSE | Median absolute % error | Predictions within 20% |
+| --- | ---: | ---: | ---: | ---: |
+| Location median baseline | 0.193 | 1.535 | **28.4%** | **38.6%** |
+| Hedonic Ridge | 0.281 | 1.448 | 38.0% | 25.1% |
+| **Nonlinear gradient boosting** | **0.334** | **1.394** | 31.2% | 32.3% |
+
+The nonlinear model explains more out-of-time variation and has the lowest log RMSE. The simple location baseline still has a lower median percentage error, so the project reports the trade-off rather than cherry-picking one metric.
+
+![Predictive feature importance](outputs/predictive_feature_importance.png)
 
 ## Robustness & risk analysis
 
-The project includes a dedicated layer asking a different question: **how fragile are the conclusions?**
+The project includes a dedicated layer asking: **how fragile are the conclusions?**
 
 ### Duplicate-like listing sensitivity
 
-Because the analytical source does not provide a verified dwelling identity key, the project uses feature fingerprints rather than claiming exact deduplication.
+A strict same-month property fingerprint identified **1,093 extra duplicate-like rows**, only **0.21%** of the core analytical sample. Removing them changed the nationwide median asking price/m² by only **+0.251%** and did not change the Tehran median.
 
-- **2,091** rows match a strict same-month duplicate-like fingerprint.
-- **1,093** are extra rows beyond the first matching record, only **0.21%** of the core sample.
-- Removing those strict duplicate-like extras changes the nationwide median asking price/m² by only **+0.251%**.
-- A broader cross-month repeat-like fingerprint identifies **12,182 potential clusters** covering **41,181 rows**; this is explicitly treated as an upper-bound risk indicator, not verified duplication.
+A broader cross-month fingerprint identifies potential repeat-like clusters, but these are explicitly treated as an **upper-bound risk signal**, not verified duplicate properties.
 
 ![Duplicate sensitivity](outputs/duplicate_sensitivity.png)
 
 ### Bootstrap uncertainty for Tehran neighborhoods
 
-For every Tehran neighborhood with at least **250 listings**, the pipeline calculates a non-parametric **95% bootstrap confidence interval** for median asking price/m² using 300 replications.
-
-Some large neighborhood samples are highly precise: for example, Sazman Barnameh, Kooy-e Ferdos, Bagh Feyz, Central Jannat Abad, and South Jannat Abad have relative 95% CI widths around **1.8–2.0%**. Other eligible neighborhoods have materially wider intervals, making the uncertainty visible rather than hiding it behind a single rank.
+Every Tehran neighborhood with at least **250 listings** receives a non-parametric **95% bootstrap confidence interval** for median asking price/m² using 300 replications. This makes ranking uncertainty visible rather than presenting neighborhood medians as perfectly precise.
 
 ![Tehran neighborhood uncertainty](outputs/tehran_neighborhood_uncertainty.png)
 
-### Spatial holdout: neighborhoods never seen during training
+### Spatial holdout: completely unseen neighborhoods
 
-A **GroupKFold** validation holds out entire Tehran neighborhoods. The models never see listings from those neighborhood labels during training.
+A grouped validation design holds out entire Tehran neighborhoods. The spatial model does **not** use the neighborhood name; it must generalize from property characteristics plus approximate latitude, longitude, and privacy radius.
 
 | Model | R² on log price/m² | Median absolute % error | Within 20% | Within 30% |
 | --- | ---: | ---: | ---: | ---: |
@@ -140,17 +175,15 @@ A **GroupKFold** validation holds out entire Tehran neighborhoods. The models ne
 | Property-only gradient boosting | 0.154 | 25.1% | 40.9% | 57.9% |
 | **Spatial gradient boosting** | **0.201** | **20.9%** | **48.2%** | **65.7%** |
 
-The spatial model excludes the neighborhood name and instead uses property characteristics plus approximate latitude, longitude, and privacy radius. Its improvement over the property-only model demonstrates useful spatial information while also showing that unseen-neighborhood prediction remains substantially harder than ordinary row-level prediction.
+This is intentionally harder than ordinary row-level validation and provides a more realistic view of geographic generalization risk.
 
-![Spatial holdout model comparison](outputs/spatial_holdout_model_comparison.png)
+Full risk analysis: [`outputs/ROBUSTNESS_RISK_ANALYSIS.md`](outputs/ROBUSTNESS_RISK_ANALYSIS.md)
 
-### Affordable / Mid-market / Premium segmentation
+Risk methodology: [`docs/robustness_risk_methodology.md`](docs/robustness_risk_methodology.md)
 
-Eligible Tehran neighborhoods are split into three equal-count groups using the sample-size-stabilized neighborhood benchmark:
+## Tehran market segmentation
 
-- **Affordable:** ≤ 71.48M source units/m²
-- **Mid-market:** > 71.48M and ≤ 98.09M
-- **Premium:** > 98.09M
+Eligible Tehran neighborhoods are divided into three relative market tiers using the sample-size-stabilized neighborhood benchmark.
 
 | Segment | Neighborhoods | Listings | Listing share | Median asking price / m² | Median size | Elevator | Parking |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -160,69 +193,40 @@ Eligible Tehran neighborhoods are split into three equal-count groups using the 
 
 These are **relative analytical market tiers**, not official affordability or investment classifications.
 
-![Tehran market segments](outputs/tehran_market_segments.png)
-
-Full risk report: [`outputs/ROBUSTNESS_RISK_ANALYSIS.md`](outputs/ROBUSTNESS_RISK_ANALYSIS.md)
-
-Risk methodology: [`docs/robustness_risk_methodology.md`](docs/robustness_risk_methodology.md)
-
-## Advanced modeling: interpretation + prediction
-
-The project deliberately separates **interpretability** from **predictive performance**:
-
-1. **Regularized hedonic Ridge model** — an interpretable multivariable model for controlled associations.
-2. **Target-encoded gradient boosting** — a nonlinear predictive benchmark.
-3. **Location median baseline** — a deliberately simple benchmark.
-
-All three are evaluated on the same **out-of-time holdout: October 2024 through March 2025**.
-
-| Model | R² on log price/m² | Log RMSE | Median absolute % error | Predictions within 20% |
-| --- | ---: | ---: | ---: | ---: |
-| Location median baseline | 0.193 | 1.535 | **28.4%** | **38.6%** |
-| Hedonic Ridge | 0.281 | 1.448 | 38.0% | 25.1% |
-| Nonlinear gradient boosting | **0.334** | **1.394** | 31.2% | 32.3% |
-
-The nonlinear model explains more out-of-time variation and has the lowest log RMSE. The simple location baseline still has a lower median percentage error, so the project reports the metric trade-off rather than cherry-picking one score.
-
-![Model comparison](outputs/model_comparison.png)
-
-![Predictive feature importance](outputs/predictive_feature_importance.png)
-
 ## Amenities and modernization-related indicators
 
-Raw nationwide comparisons show substantial differences in median asking price/m² between properties with and without amenities. After a nonlinear model controls for included location and property variables, elevator availability is associated with approximately **+23.2%** and parking with approximately **+14.9%** in predicted asking price/m² on the counterfactual validation sample.
+After controlling for included location and property variables in the nonlinear model, elevator availability is associated with approximately **+23.2%** and parking with approximately **+14.9%** in predicted asking price/m² on the counterfactual validation sample.
 
 These are **conditional model associations, not causal price premiums**.
 
 ![Adjusted amenity associations](outputs/predictive_amenity_associations.png)
 
-![Price per sqm by construction period](outputs/price_per_sqm_by_construction_period.png)
-
 ## Methodological guardrails
 
-The Divar dataset does **not** directly label properties as having a "modern" or "traditional" architectural style. Construction year and available amenities are therefore treated as **observable modernization-related indicators**, not invented architectural-style labels.
+The dataset does **not** directly label properties as having a validated "modern" or "traditional" architectural style. Construction year and amenities are therefore treated as **observable modernization-related indicators**, not invented architectural-style labels.
 
-Other important limits include asking-vs-transaction price differences, incomplete platform coverage, approximate geographic fields, non-random missingness, possible repeat listings, and unobserved quality. Confidence intervals quantify sampling uncertainty in the observed listings only.
+Other limitations include asking-vs-transaction price differences, incomplete platform coverage, approximate geographic fields, non-random missingness, possible repeat listings, and unobserved quality.
 
-Full core methodology: [`docs/methodology.md`](docs/methodology.md)
+Full methodology: [`docs/methodology.md`](docs/methodology.md)
 
-## Portfolio artifacts
+## Portfolio navigation
 
-- [`outputs/ROBUSTNESS_RISK_ANALYSIS.md`](outputs/ROBUSTNESS_RISK_ANALYSIS.md) — duplicate sensitivity, uncertainty, spatial validation, and segmentation report.
-- [`notebooks/03_robustness_risk_analysis.ipynb`](notebooks/03_robustness_risk_analysis.ipynb) — risk-analysis portfolio walkthrough.
-- [`docs/robustness_risk_methodology.md`](docs/robustness_risk_methodology.md) — detailed risk methodology and guardrails.
-- [`outputs/CITY_DEEP_DIVE.md`](outputs/CITY_DEEP_DIVE.md) — Tehran neighborhood and major-city time-series report.
-- [`notebooks/02_city_deep_dive.ipynb`](notebooks/02_city_deep_dive.ipynb) — city/neighborhood portfolio walkthrough.
-- [`outputs/EXECUTIVE_SUMMARY.md`](outputs/EXECUTIVE_SUMMARY.md) — business-facing nationwide summary.
-- [`outputs/MODEL_CARD.md`](outputs/MODEL_CARD.md) — hedonic Ridge documentation.
+- **[`EXECUTIVE_PORTFOLIO.md`](EXECUTIVE_PORTFOLIO.md)** — recruiter-facing 30-second overview.
+- [`outputs/CITY_DEEP_DIVE.md`](outputs/CITY_DEEP_DIVE.md) — Tehran neighborhoods and major-city trends.
+- [`outputs/ROBUSTNESS_RISK_ANALYSIS.md`](outputs/ROBUSTNESS_RISK_ANALYSIS.md) — duplicate sensitivity, uncertainty, spatial validation, and segmentation.
+- [`outputs/EXECUTIVE_SUMMARY.md`](outputs/EXECUTIVE_SUMMARY.md) — advanced modeling summary.
+- [`outputs/MODEL_CARD.md`](outputs/MODEL_CARD.md) — hedonic Ridge model documentation.
 - [`outputs/PREDICTIVE_MODEL_CARD.md`](outputs/PREDICTIVE_MODEL_CARD.md) — nonlinear model documentation.
 - [`notebooks/01_advanced_market_analysis.ipynb`](notebooks/01_advanced_market_analysis.ipynb) — advanced modeling walkthrough.
+- [`notebooks/02_city_deep_dive.ipynb`](notebooks/02_city_deep_dive.ipynb) — city/neighborhood walkthrough.
+- [`notebooks/03_robustness_risk_analysis.ipynb`](notebooks/03_robustness_risk_analysis.ipynb) — robustness walkthrough.
 
 ## Repository structure
 
 ```text
 Iran-Real-Estate-Market-Analysis/
 ├── README.md
+├── EXECUTIVE_PORTFOLIO.md
 ├── LICENSE
 ├── requirements.txt
 ├── docs/
@@ -246,8 +250,7 @@ Iran-Real-Estate-Market-Analysis/
 │   ├── EXECUTIVE_SUMMARY.md
 │   ├── CITY_DEEP_DIVE.md
 │   ├── ROBUSTNESS_RISK_ANALYSIS.md
-│   ├── model and risk tables...
-│   └── portfolio charts...
+│   └── charts and supporting tables...
 └── .github/workflows/
     ├── code-quality.yml
     └── run-analysis.yml
@@ -273,26 +276,17 @@ The raw and large processed files are intentionally excluded from Git. GitHub Ac
 
 - Source data is anonymized by the publisher.
 - Raw data is not committed to this repository.
-- Cleaning and sensitivity rules are implemented in code rather than manually in spreadsheets.
-- Outlier, neighborhood, monthly-sample, uncertainty, and segmentation rules are explicit and reproducible.
+- Cleaning, outlier, uncertainty, duplicate-sensitivity, and segmentation rules are implemented in code.
 - Asking prices are never presented as completed-sale transaction prices.
 - Geographic fields are treated as approximate rather than exact addresses or official polygons.
 - Amenity-price relationships are described as associations, not causal effects.
 - Predictive validation includes both temporal and geographic holdouts.
-- Duplicate-like fingerprints are labelled as probabilistic risk diagnostics, not verified property matches.
-- A simple benchmark is retained so model complexity must justify itself empirically.
+- Duplicate-like fingerprints are labelled as probabilistic diagnostics, not verified property matches.
+- Simple benchmarks are retained so model complexity must justify itself empirically.
 
 ## License and attribution
 
 The Divar source dataset is published under the **Open Database License (ODbL)**. Dataset licensing and attribution remain with the original publisher. The code in this repository is licensed separately under the MIT License; see [`LICENSE`](LICENSE).
-
-## Possible next extensions
-
-- Quantile models for different parts of the price distribution.
-- Confidence bands for the composition-adjusted city time index.
-- Stronger repeat-listing identification if a future source provides a stable listing/property identifier.
-- External validation against an independent transaction or official price series if comparable data becomes available.
-- Currency-denomination validation before presenting converted monetary values.
 
 ---
 
