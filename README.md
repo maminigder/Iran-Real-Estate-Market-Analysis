@@ -6,7 +6,7 @@
 A nationwide, reproducible real-estate market intelligence project combining **market analysis, neighborhood analytics, spatial modeling, time-series adjustment, machine learning, uncertainty analysis, and robustness testing**.
 
 **Author:** Mohammad Amin Igder  
-**Focus:** Real Estate • Market Analysis • Business Analytics • Python • Machine Learning
+**Project scope:** Market Research • Market Intelligence • Applied Analytics • Decision Support
 
 > **Recruiter / hiring manager:** start with the [Executive Portfolio — 30-second project overview](EXECUTIVE_PORTFOLIO.md).
 
