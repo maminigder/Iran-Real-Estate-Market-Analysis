@@ -1,7 +1,6 @@
 # Iran Residential Real Estate Market Analysis — Executive Portfolio
 
-**Mohammad Amin Igder**  
-Real Estate • Market Analysis • Business Analytics • Python • Machine Learning
+**Mohammad Amin Igder**
 
 > A nationwide real-estate market intelligence project built from large-scale Iranian property-listing data. The goal was not simply to predict prices, but to turn a complex listing dataset into a defensible market-analysis case study with geographic, statistical, predictive, and risk-validation layers.
 
